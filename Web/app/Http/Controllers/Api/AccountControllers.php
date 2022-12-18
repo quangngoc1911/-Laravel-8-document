@@ -10,7 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AccountControllers extends Controller{
-    public function register (Request $request)
+
+    public function register(){
+        $data['title'] = 'Register';
+        return view('register',$data);
+    }
+
+    public function register_action (Request $request)
     {
         //validasi
         $validator = Validator::make($request->all(),[
@@ -27,24 +33,40 @@ class AccountControllers extends Controller{
             'password.max'=>'Character limit is 255 !!!',
             'password.confirmed'=>'Password no match'
         ]);
-
-        if($validator->fails())
-        {
-            return response()->json([
-                'status' => false,
-                'message' => $validator->errors()
-            ],400);
-        }else{
+        
             $account = new Account();
             $account->HoVaTen = $request->HoVaTen;
             $account->TenDN = $request->TenDN;
             $account->password = Hash::make($request->password);
             $account->save();
+            
+            return redirect()->route('login')->with('success','Register Success. Please Login !');
+            
+    }
 
-            return response()->json([
-                'status' => true,
-                'message' => 'Register Success.'
-            ],201);
-        }   
+    public function login(){
+        $data['title'] = 'Login';
+        return view('login',$data);
+    }
+
+    public function login_action (Request $request)
+    {
+        //validasi
+        $validator = Validator::make($request->all(),[
+            'TenDN'=>['required','max:255'],
+            'password'=>['required','max:255']
+        ],[
+            'TenDN.required'=>'Please enter your account !!!',
+            'TenDN.max'=>'Character limit is 255 !!!',
+            'password.required'=>'Please enter your password !!!',
+            'password.max'=>'Character limit is 255 !!!',
+        ]);
+
+        if(Auth::attempt(['TenDN' => $request->TenDN, 'password' => $request->password])){
+            $request->session()->regenerate();
+            return redirect()->intended('/');
+        }
+
+        return back()->withErrors('password','Wrong username or password!');     
     }
 }
