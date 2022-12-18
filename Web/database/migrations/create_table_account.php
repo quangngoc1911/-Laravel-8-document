@@ -14,15 +14,15 @@ return new class extends Migration
     public function up()
     {
         Schema::create('accounts', function (Blueprint $table) {
-            $table->id();
+            $table->id('accounts_id');
             $table->string('HoVaTen');
             $table->string('TenDN')->unique();
             $table->string('password');
-            $table->string('Role');
-            $table->integer('IdChucVu');
-            $table->string('Phone');
-            $table->string('Nhom');
-            $table->integer('IdDiaChiCongTac');
+            $table->string('Role')->nullable();
+            $table->integer('IdChucVu')->nullable();
+            $table->string('Phone')->nullable();
+            $table->string('Nhom')->nullable();
+            $table->integer('IdDiaChiCongTac')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

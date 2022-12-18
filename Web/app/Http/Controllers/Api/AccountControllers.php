@@ -4,37 +4,32 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\Account;
+use App\Models\User;
 
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Auth;
+// use Illuminate\Support\Facades\Validator;
 
 class AccountControllers extends Controller{
 
+
+    //register
     public function register(){
-        $data['title'] = 'Register';
-        return view('register',$data);
+        $data['title'] = 'register';
+        return view('\Auth\Register',$data);
     }
 
     public function register_action (Request $request)
     {
         //validasi
-        $validator = Validator::make($request->all(),[
-            'HoVaTen' => ['required','max:255'],
-            'TenDN'=>['required','max:255','unique:accounts'],
-            'password'=>['required','max:255','confirmed']
-        ],[
-            'HoVaTen.required' => 'Please enter your first and last name !!!',
-            'HoVaTen.max' => 'Character limit is 255 !!!',
-            'TenDN.required'=>'Please enter your account !!!',
-            'TenDN.unique'=> 'This account has already existed !!! ',
-            'TenDN.max'=>'Character limit is 255 !!!',
-            'password.required'=>'Please enter your password !!!',
-            'password.max'=>'Character limit is 255 !!!',
-            'password.confirmed'=>'Password no match'
+        $request -> validate([
+            'HoVaTen' => 'required',
+            'TenDN'=>'required|unique:accounts',
+            'password'=>'required',
+            'password_confirm' =>'required|same:password'
         ]);
         
-            $account = new Account();
+            $account = new User();
             $account->HoVaTen = $request->HoVaTen;
             $account->TenDN = $request->TenDN;
             $account->password = Hash::make($request->password);
@@ -44,22 +39,19 @@ class AccountControllers extends Controller{
             
     }
 
+
+    //login
     public function login(){
-        $data['title'] = 'Login';
-        return view('login',$data);
+        $data['title'] = 'login';
+        return view('\Auth\Login',$data);
     }
 
     public function login_action (Request $request)
     {
         //validasi
-        $validator = Validator::make($request->all(),[
-            'TenDN'=>['required','max:255'],
-            'password'=>['required','max:255']
-        ],[
-            'TenDN.required'=>'Please enter your account !!!',
-            'TenDN.max'=>'Character limit is 255 !!!',
-            'password.required'=>'Please enter your password !!!',
-            'password.max'=>'Character limit is 255 !!!',
+        $request -> validate([
+            'TenDN'=>'required',
+            'password'=>'required'
         ]);
 
         if(Auth::attempt(['TenDN' => $request->TenDN, 'password' => $request->password])){
@@ -67,6 +59,15 @@ class AccountControllers extends Controller{
             return redirect()->intended('/');
         }
 
-        return back()->withErrors('password','Wrong username or password!');     
+        return back()->withErrors(['password'=>'Wrong username or password!']);     
+    }
+
+    //logout
+    public function logout(Request $request)
+    {
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect()->route('login');
     }
 }

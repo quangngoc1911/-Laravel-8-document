@@ -12,10 +12,10 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 100px 0;
+    padding: 50px 0;
   }
   .signup {
-    padding: 90px 75px;
+    padding: 20px 75px;
     background-color: #fff;
     width: 100%;
     max-width: 600px;

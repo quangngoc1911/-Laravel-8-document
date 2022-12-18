@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AccountControllers;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,11 +15,16 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('login');
-});
+    return view('welcome',['title' => 'welcom']);
+})->name('welcom');
 
-Route::post('register',[AccountControllers::class, 'register'])->name('register');
-Route::post('register_action',[AccountControllers::class, 'register_action'])->name('register.action');
+Route::get('register', function () {
+    return view('\Auth\Register',['title' => 'Register']);
+})->name('register');
 
-Route::post('login',[AccountControllers::class, 'login'])->name('login');
-Route::post('login_action',[AccountControllers::class, 'login_action'])->name('login.action');
+Route::post('register',[AccountControllers::class, 'register_action'])->name('register.action');
+
+Route::get('login',[AccountControllers::class, 'login'])->name('login');
+Route::post('login',[AccountControllers::class, 'login_action'])->name('login.action');
+
+Route::get('logout', [AccountControllers::class, 'logout'])->name('logout');
